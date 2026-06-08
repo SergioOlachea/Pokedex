@@ -53,6 +53,7 @@ private val CardBg         = Color(0xFFF2F2F2)
 private val TextPrimary    = Color(0xFF1A1A1A)
 private val TextSecondary  = Color(0xFF888888)
 private val IconTint       = Color(0xFF444444)
+private val ErrorColor     = Color(0xFFFF1744)
 
 // ─────────────────────────────────────────
 // Pantalla de Registro
@@ -160,7 +161,7 @@ fun RegisterView(
                 if (displayError != null) {
                     Text(
                         text = displayError,
-                        color = MaterialTheme.colorScheme.error,
+                        color = ErrorColor,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)

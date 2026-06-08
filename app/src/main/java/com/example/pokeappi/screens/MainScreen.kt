@@ -10,10 +10,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pokeappi.Components.MessageCard
 import com.example.pokeappi.Components.PokemonCard
 import com.example.pokeappi.Components.PokemonDetails
 import com.example.pokeappi.Components.PokemonTopBar
@@ -29,7 +33,7 @@ fun MainScreen(
     val selectedDetail by viewModel.selectedPokemonDetail
     val showBottomSheet by viewModel.showDetailBottomSheet
     val sheetState = rememberModalBottomSheetState()
-    var searchText by remember { mutableStateOf("") }
+    val searchText = viewModel.searchText.value
     val speciesInfo by viewModel.speciesInfo
     val pokemonTeamState by viewModel.pokemonTeam.collectAsState()
 
@@ -38,40 +42,61 @@ fun MainScreen(
             PokemonTopBar(
                 searchText = searchText,
                 onSearchValueChange = { newText ->
-                    searchText = newText
                     viewModel.onSearchTextChange(newText)
                 }
             )
         },
         containerColor = Color.White
     ) { paddingValues ->
-        // Cuadricula de Pokemon
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color(0xFFF5F5F5))
-        ) {
-            // Muestra la lista filtrada del ViewModel
-            items(viewModel.filteredPokemon.value) { pokemon ->
-                val isInTeam = pokemonTeamState.contains(pokemon.name)
-                PokemonCard(
-                    pokemon = null,
-                    name = pokemon.name,
-                    url = pokemon.url,
-                    type = pokemon.type,
-                    isInTeam = isInTeam,
-                    onClick = {
-                        viewModel.selectPokemon(pokemon.name) // Abre el detalle
-                    },
-                    onTeamToggle = {
-                        viewModel.toggleTeamMember(pokemon.name)
-                    }
+        val filteredList = viewModel.filteredPokemon.value
+        // Tarjeta cuando no hay resultados
+        if (filteredList.isEmpty() && searchText.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(Color(0xFFF5F5F5)),
+                contentAlignment = Alignment.Center
+            ) {
+                MessageCard(
+                    title = "Sin Resultados",
+                    message = "No encontramos ningún Pokémon que coincida con \"$searchText\".\nIntenta buscar con otro nombre o número.",
+                    icon = Icons.Default.Search,
+                    iconSize = 80.dp,
+                    imageSize = 40.dp,
+                    cardPadding = 32.dp,
+                    modifier = Modifier.padding(24.dp)
                 )
+            }
+        } else {
+            // Cuadricula de Pokemon
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(Color(0xFFF5F5F5))
+            ) {
+                // Muestra la lista filtrada del ViewModel
+                items(filteredList) { pokemon ->
+                    val isInTeam = pokemonTeamState.contains(pokemon.name)
+                    PokemonCard(
+                        pokemon = null,
+                        name = pokemon.name,
+                        url = pokemon.url,
+                        type = pokemon.type,
+                        isInTeam = isInTeam,
+                        onClick = {
+                            viewModel.selectPokemon(pokemon.name) // Abre el detalle
+                        },
+                        onTeamToggle = {
+                            viewModel.toggleTeamMember(pokemon.name)
+                        }
+                    )
+                }
             }
         }
     }

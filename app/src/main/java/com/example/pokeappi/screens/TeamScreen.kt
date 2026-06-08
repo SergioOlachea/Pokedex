@@ -5,9 +5,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.res.painterResource
+import com.example.pokeappi.R
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -15,15 +18,14 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.pokeappi.Components.MessageCard
 import com.example.pokeappi.Components.PokemonCard
 import com.example.pokeappi.Components.PokemonDetails
 import com.example.pokeappi.Components.PokemonTopBar
@@ -49,14 +51,13 @@ fun TeamScreen(
     val showBottomSheet by viewModel.showDetailBottomSheet
     val sheetState = rememberModalBottomSheetState()
     val speciesInfo by viewModel.speciesInfo
-    var searchText by remember { mutableStateOf("") }
+    val searchText = viewModel.searchText.value
 
     Scaffold(
         topBar = {
             PokemonTopBar(
                 searchText = searchText,
                 onSearchValueChange = { newText ->
-                    searchText = newText
                     viewModel.onSearchTextChange(newText)
                 }
             )
@@ -77,9 +78,41 @@ fun TeamScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
+// Mensaje cuando el equipo esta vacio o no coincide con la busqueda
         if (teamList.isEmpty()) {
-            Text(text = "Tu equipo está vacío. ¡Ve a la pantalla principal y selecciona hasta 6 Pokémon!")
+            if (searchText.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MessageCard(
+                        title = "Sin Coincidencias",
+                        message = "Ningún Pokémon en tu equipo coincide con \"$searchText\".",
+                        icon = Icons.Default.Search,
+                        iconSize = 60.dp,
+                        imageSize = 30.dp,
+                        cardPadding = 24.dp
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MessageCard(
+                        title = "¡Equipo Vacío!",
+                        message = "Tu equipo está vacío. ¡Ve a la pantalla principal y selecciona hasta 6 Pokémon!",
+                        imagePainter = painterResource(id = R.drawable.pokeball),
+                        iconSize = 100.dp,
+                        imageSize = 56.dp,
+                        cardPadding = 32.dp
+                    )
+                }
+            }
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -99,7 +132,7 @@ fun TeamScreen(
                     )
                 }
             }
-            }
+        }
         }
     }
 // Ventana emergente de detalles (BottomSheet)

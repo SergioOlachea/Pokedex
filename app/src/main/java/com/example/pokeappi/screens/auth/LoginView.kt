@@ -48,6 +48,7 @@ private val CardBg         = Color(0xFFF2F2F2)
 private val TextPrimary    = Color(0xFF1A1A1A)
 private val TextSecondary  = Color(0xFF666666)
 private val IconTint       = Color(0xFF444444)
+private val ErrorColor     = Color(0xFFFF1744)
 
 // ─────────────────────────────────────────
 // Pantalla de Login
@@ -173,7 +174,7 @@ fun LoginView(
                 if (errorMessage != null) {
                     Text(
                         text = errorMessage!!,
-                        color = MaterialTheme.colorScheme.error,
+                        color = ErrorColor,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -187,6 +188,7 @@ fun LoginView(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
                         .height(54.dp),
                     shape = RoundedCornerShape(50.dp),
                     colors = ButtonDefaults.buttonColors(

@@ -30,6 +30,9 @@ class PokemonViewModel : ViewModel() {
     // Lista que se actualiza con el filtro de busqueda
     var filteredPokemon = mutableStateOf<List<SimplePokemon>>(emptyList())
 
+    // Texto de busqueda para mantenerlo entre las pantallas Main y Team
+    var searchText = mutableStateOf("")
+
     // Estados para los detalles del pokemon
     private val _selectedPokemonDetail = mutableStateOf<PokemonDetailResponse?>(null)
     val selectedPokemonDetail: State<PokemonDetailResponse?> = _selectedPokemonDetail
@@ -49,6 +52,14 @@ class PokemonViewModel : ViewModel() {
     // Estado para la UI
     private val _pokemonTeam = MutableStateFlow<Set<String>>(emptySet())
     val pokemonTeam: StateFlow<Set<String>> = _pokemonTeam.asStateFlow()
+
+    // Estado para mensajes/errores
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
+    fun clearErrorMessage() {
+        _errorMessage.value = null
+    }
 
     // ID del usuario actual de Firebase
     private val currentUserId: String?
@@ -116,6 +127,7 @@ class PokemonViewModel : ViewModel() {
 
     // Funcion para el filtro de busqueda por nombre o numero
     fun onSearchTextChange(query: String) {
+        searchText.value = query
         filteredPokemon.value = if (query.isEmpty()) {
             allPokemon
         } else {
@@ -151,6 +163,7 @@ class PokemonViewModel : ViewModel() {
             if (currentTeam.size < 6) {
                 currentTeam.add(pokemonName)
             } else {
+                _errorMessage.value = "¡Tu equipo está lleno! No puedes tener más de 6 Pokémon."
                 return
             }
         }
